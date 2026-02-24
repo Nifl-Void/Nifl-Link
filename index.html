@@ -3,105 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nifl-Link | Rituální Sněm</title>
+  <title>NIFL-LINK | Rituální Sněm</title>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <style>
-    :root { --gold: #bd9b5d; --bg: #050505; }
+    :root { 
+        --gold: #bd9b5d; 
+        --bg: #050505; 
+        --dim: #1a1a1a; 
+        --text: #e0e0e0; 
+        --glow: rgba(189,155,93,0.2);
+        --font-sys: 'Courier New', monospace;
+    }
     
     body, html { 
       margin: 0; padding: 0; width: 100%; height: 100%; 
-      background-color: var(--bg);
-      color: #e0e0e0; font-family: "Segoe UI", sans-serif; 
+      background-color: var(--bg); color: var(--text); 
+      font-family: var(--font-sys); 
       display: flex; align-items: center; justify-content: center; overflow: hidden; 
+    }
+
+    /* Návratové tlačítko */
+    .back-to-pulse {
+        position: fixed; top: 20px; left: 20px; z-index: 1000;
+        color: var(--text); text-decoration: none; font-family: var(--font-sys);
+        font-size: 12px; border: 1px solid var(--dim); padding: 10px 15px;
+        background: rgba(10,10,10,0.8); transition: 0.3s; letter-spacing: 2px;
+    }
+    .back-to-pulse:hover {
+        border-color: var(--gold); color: #fff; background: rgba(189,155,93,0.1);
     }
 
     .ritual-shadow {
       position: absolute; width: 100vmin; height: 100vmin;
-      background: radial-gradient(circle, rgba(15,15,15,1) 0%, rgba(5,5,5,0.8) 30%, rgba(0,0,0,0) 70%);
+      background: radial-gradient(circle, rgba(10,10,10,0.9) 0%, rgba(5,5,5,0.6) 40%, rgba(0,0,0,0) 80%);
       z-index: 2; pointer-events: none;
     }
     
-    /* 3. Bod: Interaktivní název */
     h1.main-title { 
-      position: absolute; top: 6vh; font-size: clamp(16px, 4vw, 24px); 
-      letter-spacing: 0.6em; color: #444; z-index: 10; margin: 0; 
+      position: absolute; top: 8vh; font-size: clamp(14px, 3vw, 20px); 
+      letter-spacing: 0.8em; color: #555; z-index: 10; margin: 0; 
       text-transform: uppercase; cursor: default;
       transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), letter-spacing 0.6s, color 0.6s;
-      pointer-events: auto; /* Povolení interakce */
+      pointer-events: auto;
     }
-    h1.main-title:hover { 
-      transform: scale(1.1); 
-      letter-spacing: 0.8em;
-      color: #666;
-    }
-    h1.main-title span { color: var(--gold); opacity: 0.9; text-shadow: 0 0 10px rgba(189,155,93,0.2); }
+    h1.main-title:hover { transform: scale(1.1); letter-spacing: 1em; color: #888; }
+    h1.main-title span { color: var(--gold); }
 
-    /* 1. Bod: Vyšší opacity Matrixu */
-    #matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.45; pointer-events: none; }
+    #matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.25; pointer-events: none; }
     
     .stars-container { position: relative; width: 85vmin; height: 85vmin; display: flex; align-items: center; justify-content: center; z-index: 4; }
     
-    @keyframes breath {
-      0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 5px rgba(189,155,93,0)); }
-      50% { opacity: 0.7; filter: drop-shadow(0 0 10px rgba(189,155,93,0.3)); }
-    }
+    @keyframes breath { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; filter: drop-shadow(0 0 10px var(--glow)); } }
 
-    /* 3. Bod: Interaktivní runy v kruhu */
     .star { 
-      position: absolute; font-size: clamp(22px, 6vmin, 40px); color: #1a1a1a; 
+      position: absolute; font-size: clamp(22px, 6vmin, 40px); color: var(--dim); 
       transition: color 0.8s, filter 0.8s, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      user-select: none; cursor: pointer;
-      animation: breath 8s ease-in-out infinite;
-      pointer-events: auto;
+      user-select: none; cursor: pointer; animation: breath 8s ease-in-out infinite; pointer-events: auto;
     }
-    .star:hover { 
-      transform: scale(1.4); 
-      color: #444; 
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));
-    }
+    .star:hover { transform: scale(1.4); color: #666; filter: drop-shadow(0 0 8px rgba(255,255,255,0.1)); }
     .star.glow { color: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); animation: none; opacity: 1; }
 
     #centerBtn { 
       width: 18vmin; height: 18vmin; max-width: 90px; max-height: 90px; 
-      font-size: 35px; background: radial-gradient(circle, #0a0a0a, #000); 
-      color: var(--gold); border: 1px solid rgba(189,155,93,0.3); border-radius: 50%; cursor: pointer; 
+      font-size: 35px; background: rgba(10,10,10,0.9); 
+      color: var(--gold); border: 1px solid var(--dim); border-radius: 50%; cursor: pointer; 
       z-index: 150; box-shadow: 0 0 30px rgba(0,0,0,1); transition: 0.5s; 
     }
-    #centerBtn:hover { transform: scale(1.15); border-color: var(--gold); box-shadow: 0 0 40px rgba(189,155,93,0.2); }
+    #centerBtn:hover { transform: scale(1.15); border-color: var(--gold); box-shadow: 0 0 40px var(--glow); }
     
-    /* 2. Bod: Uzamčení pouze přes okraj */
     #centerBtn.locked { 
-      background: radial-gradient(circle, #0f0505, #000); 
-      color: #ff4444; 
-      border: 2px solid #ff0000; 
-      box-shadow: 0 0 25px rgba(255, 0, 0, 0.4), inset 0 0 15px rgba(255,0,0,0.2); 
+      background: radial-gradient(circle, #1a0505, #000); color: #ff4444; border: 1px solid #ff0000; 
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.2); 
     }
-    #centerBtn.unlocked { background: #050505; color: var(--gold); border: 1px solid var(--gold); }
+    #centerBtn.unlocked { background: #0a0a0a; color: var(--gold); border: 1px solid var(--gold); }
 
     #ui-panel { 
-      position: absolute; width: 210px; height: 210px; 
-      background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px);
-      border: 1px solid rgba(189, 155, 93, 0.2); border-radius: 50%; 
+      position: absolute; width: 240px; height: 240px; 
+      background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px);
+      border: 1px solid var(--dim); border-radius: 50%; 
       display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      z-index: 200; box-shadow: inset 0 0 30px #000;
+      z-index: 200; box-shadow: 0 0 40px var(--glow);
     }
     
-    input { background: transparent; border: none; border-bottom: 1px solid var(--gold); color: white; padding: 5px; width: 80%; margin-bottom: 15px; text-align: center; font-size: 14px; outline: none; }
-    button.menu-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; border-radius: 20px; cursor: pointer; width: 80%; margin: 5px 0; font-size: 11px; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
-    button.menu-btn:hover { background: var(--gold); color: #000; }
+    input { background: transparent; border: none; border-bottom: 1px solid var(--dim); color: var(--text); padding: 10px; width: 70%; margin-bottom: 20px; text-align: center; font-size: 14px; outline: none; font-family: var(--font-sys); transition: 0.3s; }
+    input:focus { border-bottom: 1px solid var(--gold); }
+    
+    button.menu-btn { background: transparent; border: 1px solid var(--dim); color: var(--text); padding: 10px 15px; cursor: pointer; width: 75%; margin: 5px 0; font-size: 12px; font-family: var(--font-sys); letter-spacing: 2px; transition: 0.3s; background: rgba(20,20,20,0.5); }
+    button.menu-btn:hover { border-color: var(--gold); color: #fff; background: rgba(189,155,93,0.1); transform: scale(1.05); }
     
     .hidden { display: none !important; }
     audio { display: none; }
   </style>
 </head>
 <body>
+  
+  <a href="https://nifl-void.github.io/Nifl-Pulse/" class="back-to-pulse">[ ᛟ ] RETURN TO PULSE</a>
+
   <canvas id="matrixCanvas"></canvas>
   <div class="ritual-shadow"></div>
   <h1 class="main-title">NIFL-<span>LINK</span></h1>
   
   <div class="stars-container" id="starsContainer">
     <button id="centerBtn" class="hidden">ᛟ</button>
-    <button id="initBtn" style="z-index: 300; width: 100px; height: 100px; border-radius: 50%; background: var(--gold); border: none; font-size: 40px; cursor: pointer;">ᛟ</button>
+    <button id="initBtn" style="z-index: 300; width: 100px; height: 100px; border-radius: 50%; background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 40px; cursor: pointer; transition: 0.3s;">ᛟ</button>
 
     <div id="ui-panel" class="hidden">
       <input type="text" id="roomInput" placeholder="NÁZEV SNĚMU" maxlength="15">
@@ -118,15 +122,12 @@
 
   const container = document.getElementById('starsContainer');
   for (let i = 0; i < 12; i++) {
-    const r = document.createElement('div');
-    r.className = 'star';
-    r.textContent = runes[i];
+    const r = document.createElement('div'); r.className = 'star'; r.textContent = runes[i];
     const angle = (i * 360 / 12 - 90) * Math.PI / 180;
     r.style.left = `calc(50% + ${Math.cos(angle)*32}vmin - 15px)`;
     r.style.top = `calc(50% + ${Math.sin(angle)*32}vmin - 15px)`;
     r.style.animationDelay = `${i * 0.5}s`;
-    container.appendChild(r);
-    starElements.push(r);
+    container.appendChild(r); starElements.push(r);
   }
 
   const centerBtn = document.getElementById('centerBtn');
@@ -134,44 +135,36 @@
   const uiPanel = document.getElementById('ui-panel');
   const peerConfig = { config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }] } };
 
+  initBtn.onmouseover = () => { initBtn.style.background = 'rgba(189,155,93,0.1)'; initBtn.style.boxShadow = '0 0 20px rgba(189,155,93,0.3)'; };
+  initBtn.onmouseout = () => { initBtn.style.background = 'transparent'; initBtn.style.boxShadow = 'none'; };
+
   initBtn.onclick = async () => {
     try {
-      myStream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-      });
-      initBtn.classList.add('hidden');
-      uiPanel.classList.remove('hidden');
-    } catch(e) {
-      alert("Povolte mikrofon pro vstup.");
-    }
+      myStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+      initBtn.classList.add('hidden'); uiPanel.classList.remove('hidden');
+    } catch(e) { alert("Povolte mikrofon pro vstup do mlhy."); }
   };
 
   centerBtn.onclick = () => {
     if (!isHost) return;
-    isLocked = !isLocked;
-    updateLockUI(isLocked);
+    isLocked = !isLocked; updateLockUI(isLocked);
     connections.forEach(conn => conn.send({type: 'lock-state', locked: isLocked}));
   };
 
   function updateLockUI(locked) {
-    centerBtn.classList.toggle('locked', locked);
-    centerBtn.classList.toggle('unlocked', !locked);
+    centerBtn.classList.toggle('locked', locked); centerBtn.classList.toggle('unlocked', !locked);
     centerBtn.textContent = locked ? "ᚦ" : "ᛟ";
   }
 
   document.getElementById('btnCreate').onclick = () => {
     const id = document.getElementById('roomInput').value.trim().toLowerCase();
     if (id.length < 3) return;
-    isHost = true;
-    myPeer = new Peer(id, peerConfig);
+    isHost = true; myPeer = new Peer(id, peerConfig);
     myPeer.on('open', () => { startSession(); });
     myPeer.on('connection', (conn) => {
       if(isLocked) { conn.close(); return; }
       setupConnection(conn);
-      setTimeout(() => {
-          conn.send({type: 'peer-list', peers: Array.from(connections.keys())});
-          conn.send({type: 'lock-state', locked: isLocked});
-      }, 500);
+      setTimeout(() => { conn.send({type: 'peer-list', peers: Array.from(connections.keys())}); conn.send({type: 'lock-state', locked: isLocked}); }, 500);
     });
     myPeer.on('call', (call) => { call.answer(myStream); handleCall(call); });
   };
@@ -180,32 +173,17 @@
     const roomName = document.getElementById('roomInput').value.trim().toLowerCase();
     if (!roomName) return;
     myPeer = new Peer(undefined, peerConfig);
-    myPeer.on('open', () => {
-      const conn = myPeer.connect(roomName);
-      setupConnection(conn);
-      startSession();
-    });
+    myPeer.on('open', () => { const conn = myPeer.connect(roomName); setupConnection(conn); startSession(); });
     myPeer.on('call', (call) => { call.answer(myStream); handleCall(call); });
   };
 
-  function startSession() {
-    uiPanel.classList.add('hidden');
-    centerBtn.classList.remove('hidden');
-    centerBtn.classList.add('unlocked');
-  }
+  function startSession() { uiPanel.classList.add('hidden'); centerBtn.classList.remove('hidden'); centerBtn.classList.add('unlocked'); }
 
   function setupConnection(conn) {
-    conn.on('open', () => {
-      connections.set(conn.peer, conn);
-      myPeer.call(conn.peer, myStream);
-    });
+    conn.on('open', () => { connections.set(conn.peer, conn); myPeer.call(conn.peer, myStream); });
     conn.on('data', data => {
-      if (data.type === 'peer-list') {
-        data.peers.forEach(p => { if (!connections.has(p)) setupConnection(myPeer.connect(p)); });
-      }
-      if (data.type === 'lock-state') {
-        updateLockUI(data.locked);
-      }
+      if (data.type === 'peer-list') { data.peers.forEach(p => { if (!connections.has(p)) setupConnection(myPeer.connect(p)); }); }
+      if (data.type === 'lock-state') { updateLockUI(data.locked); }
     });
   }
 
@@ -219,32 +197,24 @@
 
   function glowRandomRune() {
     const target = starElements[Math.floor(Math.random() * starElements.length)];
-    if (!target.classList.contains('glow')) {
-        target.classList.add('glow');
-        setTimeout(() => target.classList.remove('glow'), 2500);
-    }
+    if (!target.classList.contains('glow')) { target.classList.add('glow'); setTimeout(() => target.classList.remove('glow'), 2500); }
     setTimeout(glowRandomRune, 1200 + Math.random() * 2000);
   }
   glowRandomRune();
 
-  const canvas = document.getElementById('matrixCanvas');
-  const ctx = canvas.getContext('2d');
-  const initM = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-  initM(); window.onresize = initM;
-  let drops = Array(Math.floor(canvas.width/22)).fill(1);
-  let lastTime = 0;
+  const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
+  const initM = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }; initM(); window.onresize = initM;
+  let drops = Array(Math.floor(canvas.width/22)).fill(1); let lastTime = 0;
+  
   function drawMatrix(time) {
     requestAnimationFrame(drawMatrix);
-    if (time - lastTime < 1000 / 15) return;
-    lastTime = time;
-    ctx.fillStyle = "rgba(5, 5, 5, 0.15)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // 1. Bod: Barva run v matrixu o něco jasnější (#444 místo #333)
-    ctx.fillStyle = "#444"; ctx.font = "15px monospace";
+    if (time - lastTime < 1000 / 15) return; lastTime = time;
+    ctx.fillStyle = "rgba(5, 5, 5, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#bd9b5d"; /* Zlatá matrix pro Link */ ctx.font = "15px 'Courier New'";
     drops.forEach((y, i) => {
       const text = runes[Math.floor(Math.random()*runes.length)];
       ctx.fillText(text, i*22, y*22);
-      if(y*22 > canvas.height && Math.random() > 0.99) drops[i] = 0;
+      if(y*22 > canvas.height && Math.random() > 0.98) drops[i] = 0;
       drops[i]++;
     });
   }
